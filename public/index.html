@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShipShape Systems Management Application</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>ShipShape Systems</h2>
+    <a href="#" data-section="dashboard">
+      Homepage
+    </a>
+    <a href="#" data-section="finances">
+      Finances
+    </a>
+    <a href="#" data-section="inventory">
+      Inventory
+    </a>
+    <a href="#" data-section="ship-hub">
+      Ship Hub
+    </a>
+    <a href="#" data-section="employees">
+      Employees
+    </a>
+    <a href="#" data-section="about">
+      About
+    </a>
+    <a href="#" data-section="settings">
+      Settings
+    </a>
+    <a href="#" data-section="profile">
+      Profile
+    </a>
+    <button id="logout-button" style="display: none;">Logout</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+
+    <!-- Header -->
+    <div class="header">
+      <h1>ShipShape Systems Inventory Management Platform.</h1>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="section active">
+      <div class="dashboard">
+        <h2>Welcome to ShipShape Systems</h2>
+        <p>A simple but effective piece of software for all your shipyard management needs!</p>
+      </div>
+    </div>
+
+    <!-- Inventory Management Section -->
+    <div id="inventory" class="section">
+      <h2>Inventory</h2>
+      <button class="actions add" id="add-item">Add New</button>
+      <table id="inventory-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Warehouse</th>
+            <th>Stock</th>
+            <th>Action</th>
+            <th>Add to Invoice</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Space for script to put inventory items -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Settings page -->
+    <div id="settings" class="section">
+      <h2>Settings</h2>
+      <div class="settings-content">
+        <h3>Appearance</h3>
+        <label for="theme-select">Theme:</label>
+        <select id="theme-select">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+        <button id="save-settings">Save Settings</button>
+        <p id="settings-status" style="display: none;">Settings saved!</p>
+      </div>
+    </div>
+
+    <!-- Finances section -->
+    <div id="finances" class="section">
+      <h1>Finances</h1>
+      
+      <!-- Invoice Generation Section -->
+      <div id="invoice-section">
+        <h2>Generate Invoice</h2>
+        <div>
+            <label>Customer Name: <input type="text" id="invoice-customer" placeholder="Customer Name"></label>
+            <button id="generate-invoice">Generate Invoice</button>
+        </div>
+        <table id="invoice-items-table">
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Price</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+              <!-- Invoice items will go here when added -->
+            </tbody>
+        </table>
+        <p>Total: $<span id="invoice-total">0.00</span></p>
+      </div>
+    </div>
+
+      <!-- Employee Section -->
+    <div id="employees" class="section">
+      <h2>Employees</h2>
+      <button class="actions add" id="add-employee" style="display: none;">Add New Employee</button>
+      <table id="employees-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Employee records are put here by script -->
+        </tbody>
+      </table>
+    </div>
+    
+
+    <!-- About Section -->
+    <div id="about" class="section">
+      <h2>About ShipShape Systems</h2>
+      <img src="..//images/about.jpg" alt="Shipyard Generic Image" class="image">
+      <p>ShipShape Systems is a management application primarily aimed at shipyards that provides the ability to observe and control various different aspects of a shipyard.</p>
+      
+      <h3>Key Features</h3>
+      <ul>
+        <li><strong>Inventory Management:</strong> A simple but effective stock management system.</li>
+        <li><strong>Finances:</strong> Add items from the inventory to invoices which can then be printed.</li>
+        <li><strong>Employee Management:</strong> Create, edit and delete users, and assign their access privileges, but only when logged in as an administrator.</li>
+        <li><strong>Ship Hub:</strong> Track incoming and outgoing shipments. COMING SOON.</li>
+      </ul>
+      
+      <h3>Why Choose ShipShape Systems?</h3>
+      <p>This application is highly effective for shipyard management while also being simple enough for anyone to use - regardless of their technical expertise.</p>
+
+    </div>
+      
+    
+    <!-- Overlays and Forms -->
+    <!-- Inventory Form-->
+    <div id="overlay"></div>
+    <div id="inventory-form">
+      <h3 id="form-title">Add New Item</h3>
+      <input type="text" id="item-name" placeholder="Item Name">
+      <input type="text" id="item-price" placeholder="Price">
+      <input type="text" id="item-warehouse" placeholder="Warehouse">
+      <input type="text" id="item-stock" placeholder="Stock">
+      <button id="save-item">Save</button>
+    </div>
+
+    <!-- Employee Form Overlay -->
+    <div id="employee-form" class="form-overlay" style="display: none;">
+      <h3 id="employee-form-title">Add New Employee</h3>
+      <input type="text" id="employee-username" placeholder="Username">
+      <input type="password" id="employee-password" placeholder="Password">
+      <select id="employee-role">
+        <option value="admin">Admin</option>
+        <option value="employee">Employee</option>
+      </select>
+      <button id="save-employee">Save</button>
+    </div>
+
+    <!-- Registration and Login Forms -->
+    <div id="auth-forms">
+      <div id="login-form">
+        <h3>Login</h3>
+        <form id="loginForm">
+          <input type="text" id="loginUsername" placeholder="Username" required>
+          <input type="password" id="loginPassword" placeholder="Password" required>
+          <button type="submit">Login</button>
+        </form>
+      </div>
+
+      <div id="register-form">
+        <h3>Register</h3>
+        <form id="registerForm">
+          <input type="text" id="registerUsername" placeholder="Username" required>
+          <input type="password" id="registerPassword" placeholder="Password" required>
+          <button type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
