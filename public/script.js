@@ -44,6 +44,12 @@ const generateInvoiceButton = document.getElementById('generate-invoice');
 
 let invoiceItems = [];
 
+const exchangeRates = {
+  '£': 1,
+  '$': 1.29,
+  '€': 1.19,
+}
+
 
 // Other Event Listeners
 
@@ -208,16 +214,18 @@ async function fetchInventory() {
     const items = await response.json();
     inventoryTable.innerHTML = '';
     const currencySymbol = localStorage.getItem('currency') || '£';
+    const rate = exchangeRates[currencySymbol];
     items.forEach(item => {
       const rawPrice = item.price != null ? String(item.price).replace(/[^0-9.]/g, '') : '0';
-      const cleanPrice = parseFloat(rawPrice) || 0;
+      const basePrice = parseFloat(rawPrice) || 0;
+      const convertedPrice = basePrice * rate;
       const stock = parseInt(item.stock) || 0;
       const row = inventoryTable.insertRow();
       row.dataset.id = item.id;
 
       let rowHTML = `
         <td>${item.name}</td>
-        <td>${currencySymbol}${cleanPrice.toFixed(2)}</td>
+        <td>${currencySymbol}${convertedPrice.toFixed(2)}</td>
         <td>${item.warehouse}</td>
         <td>${item.stock}</td>
         <td class="actions">
@@ -247,13 +255,13 @@ async function fetchInventory() {
 
       if (currentUserRole === 'admin') {
         row.querySelector('.add-to-invoice').addEventListener('click', () => {
-          const qtyInput = document.getElementById(`qty-${item.id}`);
-          const quantity = parseInt(qtyInput.value) || 1;
+          const quantityInput = document.getElementById(`qty-${item.id}`);
+          const quantity = parseInt(quantityInput.value) || 1;
           if (quantity > stock) {
             alert(`Quantity exceeds available stock (${stock}).`);
             return;
           }
-          addToInvoice({ ...item, price: cleanPrice }, quantity).catch(err => {
+          addToInvoice({ ...item, price: basePrice }, quantity).catch(err => {
             console.error('Error in adding item to invoice:', err);
             alert('Failed to add to invoice: ' + err.message);
           });
@@ -273,11 +281,14 @@ async function loadInventory() {
     const items = JSON.parse(inventoryData);
     inventoryTable.innerHTML = '';
     const currencySymbol = localStorage.getItem('currency') || '£';
+    const rate = exchangeRates[currencySymbol];
     items.forEach(item => {
+      const basePrice = parseFloat(item.price) || 0;
+      const convertedPrice = basePrice * rate;
       const row = inventoryTable.insertRow();
       row.innerHTML = `
         <td>${item.name}</td>
-        <td>${currencySymbol}${item.price}</td>
+        <td>${currencySymbol}${convertedPrice.toFixed(2)}</td>
         <td>${item.warehouse}</td>
         <td>${item.stock}</td>
         <td class="actions">
@@ -362,22 +373,24 @@ saveItemButton.addEventListener('click', async () => {
   const warehouse = document.getElementById('item-warehouse').value;
   const stock = document.getElementById('item-stock').value;
   const currencySymbol = localStorage.getItem('currency') || '£';
+  const rate = exchangeRates[currencySymbol];
+  const basePrice = (parseFloat(price) || 0) / rate;
 
   if (editingRow) {
     editingRow.cells[0].textContent = name;
-    editingRow.cells[1].textContent = `${currencySymbol}${parseFloat(price).toFixed(2)}`;
+    editingRow.cells[1].textContent = `${currencySymbol}${(basePrice * rate).toFixed(2)}`;
     editingRow.cells[2].textContent = warehouse;
     editingRow.cells[3].textContent = stock;
     await updateItem(editingRow.dataset.id, { name, price, warehouse, stock });
   } else {
     const newItem = await addItem({ name, price, warehouse, stock });
-    const cleanPrice = parseFloat(newItem.price) || 0;
+    const convertedPrice = (parseFloat(newItem.price) || 0) * rate;
     const row = inventoryTable.insertRow();
     row.dataset.id = newItem.id;
 
     let rowHTML = `
       <td>${newItem.name}</td>
-      <td>${currencySymbol}${cleanPrice.toFixed(2)}</td>
+      <td>${currencySymbol}${convertedPrice.toFixed(2)}</td>
       <td>${newItem.warehouse}</td>
       <td>${newItem.stock}</td>
       <td class="actions">
@@ -407,9 +420,9 @@ saveItemButton.addEventListener('click', async () => {
 
     if (currentUserRole === 'admin') {
       row.querySelector('.add-to-invoice').addEventListener('click', () => {
-        const qtyInput = document.getElementById(`qty-${newItem.id}`);
-        const quantity = parseInt(qtyInput.value) || 1;
-        addToInvoice({ ...newItem, price: cleanPrice }, quantity);
+        const quantityInput = document.getElementById(`qty-${newItem.id}`);
+        const quantity = parseInt(quantityInput.value) || 1;
+        addToInvoice({ ...newItem, price: newItem.price }, quantity);
       });
     }
   }
@@ -671,18 +684,21 @@ function updateInvoiceTable() {
   const invoiceTableBody = document.querySelector('#invoice-items-table tbody');
   invoiceTableBody.innerHTML = '';
   const currencySymbol = localStorage.getItem('currency') || '£';
+  const rate = exchangeRates[currencySymbol];
 
   invoiceItems.forEach((item, index) => {
+    const convertedPrice = item.price * rate;
+    const convertedLineTotal = item.lineTotal * rate;
     const row = invoiceTableBody.insertRow();
     row.innerHTML = `
       <td>${item.name}</td>
-      <td>${currencySymbol}${item.price.toFixed(2)} x ${item.quantity}</td>
-      <td>${currencySymbol}${item.lineTotal.toFixed(2)}</td>
+      <td>${currencySymbol}${convertedPrice.toFixed(2)} x ${item.quantity}</td>
+      <td>${currencySymbol}${convertedLineTotal.toFixed(2)}</td>
       <td><button onclick="removeInvoiceItem(${index})">Remove</button></td>
     `;
   });
 
-  const total = invoiceItems.reduce((sum, item) => sum + item.lineTotal, 0);
+  const total = invoiceItems.reduce((sum, item) => sum + item.lineTotal, 0) * rate;
   console.log('Invoice total:', total);
   document.getElementById('invoice-total').textContent = `${currencySymbol}${total.toFixed(2)}`;
 }
@@ -801,22 +817,31 @@ document.getElementById('currency').addEventListener('change', (e) => {
 
 function updateCurrencyDisplay() {
   const currencySymbol = localStorage.getItem('currency') || '£';
+  const rate = exchangeRates[currencySymbol];
+
   document.querySelectorAll('#inventory-table td:nth-child(2)').forEach(cell => {
     const value = parseFloat(cell.textContent.replace(/[^0-9.]/g, ''));
-    cell.textContent = `${currencySymbol}${value.toFixed(2)}`;
+    const baseValue = value / (exchangeRates[cell.textContent[0]] || 1);
+    cell.textContent = `${currencySymbol}${(baseValue * rate).toFixed(2)}`;
   });
+
   document.querySelectorAll('#invoice-items-table td:nth-child(2)').forEach(cell => {
     const [pricePart, quantityPart] = cell.textContent.split(' x ');
     const value = parseFloat(pricePart.replace(/[^0-9.]/g, '')) || 0;
-    cell.textContent = `${currencySymbol}${value.toFixed(2)} x ${quantityPart}`;
+    const baseValue = value / (exchangeRates[cell.textContent[0]] || 1);
+    cell.textContent = `${currencySymbol}${(baseValue * rate).toFixed(2)} x ${quantityPart}`;
   });
+
   document.querySelectorAll('#invoice-items-table td:nth-child(3)').forEach(cell => {
     const value = parseFloat(cell.textContent.replace(/[^0-9.]/g, ''));
-    cell.textContent = `${currencySymbol}${value.toFixed(2)}`;
+    const baseValue = value / (exchangeRates[cell.textContent[0]] || 1);
+    cell.textContent = `${currencySymbol}${(baseValue * rate).toFixed(2)}`;
   });
+  
   const total = document.getElementById('invoice-total');
   const totalValue = parseFloat(total.textContent.replace(/[^0-9.]/g, '')) || 0;
-  total.textContent = `${currencySymbol}${totalValue.toFixed(2)}`;
+  const baseTotal = totalValue / (exchangeRates[total.textContent[0]] || 1);
+  total.textContent = `${currencySymbol}${(baseTotal * rate).toFixed(2)}`;
 }
 
 
