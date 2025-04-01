@@ -78,8 +78,16 @@ function loadSettings() {
   document.body.className = savedTheme;
   const themeSelect = document.getElementById('theme-select');
   if (themeSelect) themeSelect.value = savedTheme;
+
   const savedFontSize = localStorage.getItem('fontSize');
   if (savedFontSize) document.body.style.fontSize = `${savedFontSize}px`;
+
+  const savedCurrency = localStorage.getItem('currency') || '£';
+  const currencySelect = document.getElementById('currency');
+  if (currencySelect) {
+    currencySelect.value = savedCurrency;
+    updateCurrencyDisplay();
+  }
 }
 
 function showSection(sectionId) {
@@ -199,6 +207,7 @@ async function fetchInventory() {
 
     const items = await response.json();
     inventoryTable.innerHTML = '';
+    const currencySymbol = localStorage.getItem('currency') || '£';
     items.forEach(item => {
       const rawPrice = item.price != null ? String(item.price).replace(/[^0-9.]/g, '') : '0';
       const cleanPrice = parseFloat(rawPrice) || 0;
@@ -208,7 +217,7 @@ async function fetchInventory() {
 
       let rowHTML = `
         <td>${item.name}</td>
-        <td>£${cleanPrice.toFixed(2)}</td>
+        <td>${currencySymbol}${cleanPrice.toFixed(2)}</td>
         <td>${item.warehouse}</td>
         <td>${item.stock}</td>
         <td class="actions">
@@ -251,6 +260,7 @@ async function fetchInventory() {
         });
       };
     });
+    updateCurrencyDisplay();
   } catch (error) {
     console.error('Error fetching inventory:', error);
     alert('Error fetching inventory: ' + error.message);
@@ -262,11 +272,12 @@ async function loadInventory() {
   if (inventoryData) {
     const items = JSON.parse(inventoryData);
     inventoryTable.innerHTML = '';
+    const currencySymbol = localStorage.getItem('currency') || '£';
     items.forEach(item => {
       const row = inventoryTable.insertRow();
       row.innerHTML = `
         <td>${item.name}</td>
-        <td>${item.price}</td>
+        <td>${currencySymbol}${item.price}</td>
         <td>${item.warehouse}</td>
         <td>${item.stock}</td>
         <td class="actions">
@@ -281,6 +292,7 @@ async function loadInventory() {
         deleteItem(row.dataset.id);
       });
     });
+    updateCurrencyDisplay();
   }
 }
 
@@ -288,11 +300,12 @@ function openForm(title, row = null) {
   formTitle.textContent = title;
   inventoryForm.style.display = 'block';
   overlay.style.display = 'block';
+  const currencySymbol = localStorage.getItem('currency') || '£';
 
   if (row) {
     document.getElementById('item-name').value = row.cells[0].textContent;
-    const priceSign = row.cells[1].textContent.replace('£', '');
-    document.getElementById('item-price').value = parseFloat(priceSign) || '';
+    const priceText = row.cells[1].textContent.replace(currencySymbol, '');
+    document.getElementById('item-price').value = parseFloat(priceText) || '';
     document.getElementById('item-warehouse').value = row.cells[2].textContent;
     document.getElementById('item-stock').value = row.cells[3].textContent;
     editingRow = row;
@@ -348,10 +361,11 @@ saveItemButton.addEventListener('click', async () => {
   const price = document.getElementById('item-price').value;
   const warehouse = document.getElementById('item-warehouse').value;
   const stock = document.getElementById('item-stock').value;
+  const currencySymbol = localStorage.getItem('currency') || '£';
 
   if (editingRow) {
     editingRow.cells[0].textContent = name;
-    editingRow.cells[1].textContent = `£${parseFloat(price).toFixed(2)}`;
+    editingRow.cells[1].textContent = `${currencySymbol}${parseFloat(price).toFixed(2)}`;
     editingRow.cells[2].textContent = warehouse;
     editingRow.cells[3].textContent = stock;
     await updateItem(editingRow.dataset.id, { name, price, warehouse, stock });
@@ -363,7 +377,7 @@ saveItemButton.addEventListener('click', async () => {
 
     let rowHTML = `
       <td>${newItem.name}</td>
-      <td>£${cleanPrice.toFixed(2)}</td>
+      <td>${currencySymbol}${cleanPrice.toFixed(2)}</td>
       <td>${newItem.warehouse}</td>
       <td>${newItem.stock}</td>
       <td class="actions">
@@ -656,20 +670,21 @@ async function addToInvoice(item, quantity) {
 function updateInvoiceTable() {
   const invoiceTableBody = document.querySelector('#invoice-items-table tbody');
   invoiceTableBody.innerHTML = '';
+  const currencySymbol = localStorage.getItem('currency') || '£';
 
   invoiceItems.forEach((item, index) => {
     const row = invoiceTableBody.insertRow();
     row.innerHTML = `
       <td>${item.name}</td>
-      <td>£${item.price.toFixed(2)} x ${item.quantity}</td>
-      <td>£${item.lineTotal.toFixed(2)}</td>
+      <td>${currencySymbol}${item.price.toFixed(2)} x ${item.quantity}</td>
+      <td>${currencySymbol}${item.lineTotal.toFixed(2)}</td>
       <td><button onclick="removeInvoiceItem(${index})">Remove</button></td>
     `;
   });
 
   const total = invoiceItems.reduce((sum, item) => sum + item.lineTotal, 0);
   console.log('Invoice total:', total);
-  document.getElementById('invoice-total').textContent = total.toFixed(2);
+  document.getElementById('invoice-total').textContent = `${currencySymbol}${total.toFixed(2)}`;
 }
 
 async function removeInvoiceItem(index) {
@@ -717,6 +732,7 @@ generateInvoiceButton.addEventListener('click', async () => {
   }
 
   const token = localStorage.getItem('token');
+  const currencySymbol = localStorage.getItem('currency') || '£';
   console.log('Generating invoice with token:', token);
   console.log('Invoice items being sent:', invoiceItems);
   try {
@@ -726,7 +742,7 @@ generateInvoiceButton.addEventListener('click', async () => {
         'Content-Type': 'application/json',
         'Authorization': token,
       },
-      body: JSON.stringify({ customerName, items: invoiceItems }),
+      body: JSON.stringify({ customerName, items: invoiceItems, currency: currencySymbol }),
     });
 
     const responseText = await response.text();
@@ -759,6 +775,15 @@ document.getElementById('save-settings')?.addEventListener('click', () => {
   const theme = document.getElementById('theme-select').value;
   localStorage.setItem('theme', theme);
   document.body.className = theme;
+
+  const fontSize = document.getElementById('font-size').value;
+  document.body.style.fontSize = `${fontSize}px`;
+  localStorage.setItem('fontSize', fontSize);
+
+  const currency = document.getElementById('currency').value;
+  localStorage.setItem('currency', currency);
+  updateCurrencyDisplay();
+
   const status = document.getElementById('settings-status');
   status.style.display = 'block';
   setTimeout(() => status.style.display = 'none', 2000);
@@ -768,6 +793,32 @@ document.getElementById('font-size').addEventListener('input', (e) => {
   document.body.style.fontSize = `${e.target.value}px`;
   localStorage.setItem('fontSize', e.target.value);
 });
+
+document.getElementById('currency').addEventListener('change', (e) => {
+  localStorage.setItem('currency', currency);
+    updateCurrencyDisplay();
+});
+
+function updateCurrencyDisplay() {
+  const currencySymbol = localStorage.getItem('currency') || '£';
+  document.querySelectorAll('#inventory-table td:nth-child(2)').forEach(cell => {
+    const value = parseFloat(cell.textContent.replace(/[^0-9.]/g, ''));
+    cell.textContent = `${currencySymbol}${value.toFixed(2)}`;
+  });
+  document.querySelectorAll('#invoice-items-table td:nth-child(2)').forEach(cell => {
+    const [pricePart, quantityPart] = cell.textContent.split(' x ');
+    const value = parseFloat(pricePart.replace(/[^0-9.]/g, '')) || 0;
+    cell.textContent = `${currencySymbol}${value.toFixed(2)} x ${quantityPart}`;
+  });
+  document.querySelectorAll('#invoice-items-table td:nth-child(3)').forEach(cell => {
+    const value = parseFloat(cell.textContent.replace(/[^0-9.]/g, ''));
+    cell.textContent = `${currencySymbol}${value.toFixed(2)}`;
+  });
+  const total = document.getElementById('invoice-total');
+  const totalValue = parseFloat(total.textContent.replace(/[^0-9.]/g, '')) || 0;
+  total.textContent = `${currencySymbol}${totalValue.toFixed(2)}`;
+}
+
 
 // DOMContentLoaded
 
