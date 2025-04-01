@@ -41,8 +41,6 @@ let editingRow = null;
 // Misc + Finances
 const overlay = document.getElementById('overlay');
 const generateInvoiceButton = document.getElementById('generate-invoice');
-const imagePath = window.electronAPI.getImagePath('about.jpg');
-document.getElementById('image').src = imagePath;
 
 let invoiceItems = [];
 
@@ -97,6 +95,13 @@ function showSection(sectionId) {
     fetchInventory();
   } 
 }
+
+function loadImage(imageName) {
+  const imagePath = window.electronAPI.getImagePath(imageName);
+  document.getElementById('image').src = imagePath;
+}
+
+loadImage('about.jpg')
 
 // Authentication Functions
 
