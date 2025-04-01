@@ -242,9 +242,12 @@ async function fetchInventory() {
             alert(`Quantity exceeds available stock (${stock}).`);
             return;
           }
-          addToInvoice({ ...item, price: cleanPrice }, quantity);
+          addToInvoice({ ...item, price: cleanPrice }, quantity).catch(err => {
+            console.error('Error in adding item to invoice:', err);
+            alert('Failed to add to invoice: ' + err.message);
+          });
         });
-      }
+      };
     });
   } catch (error) {
     console.error('Error fetching inventory:', error);
@@ -589,8 +592,9 @@ employeeForm.addEventListener('click', (event) => {
 
 // Finance Functions
 
-function addToInvoice(item, quantity) {
+async function addToInvoice(item, quantity) {
   const price = parseFloat(item.price);
+  const stock = parseInt(item.stock) || 0;
   console.log(`Adding to invoice: ${item.name}, Price: ${price}, Quantity: ${quantity}`);
   if (isNaN(price) || price < 0) {
     console.warn(`Invalid price for ${item.name}: ${item.price}`);
@@ -604,6 +608,17 @@ function addToInvoice(item, quantity) {
     alert(`Quantity exceeds available stock (${item.stock}).`);
     return;
   };
+
+  const newStock = stock - quantity;
+  try {
+    await updateItem(item.id, { name: item.name, price: item.price, warehouse: item.warehouse, stock: newStock });
+    console.log(`Stock updated for ${item.name}: ${newStock}`);
+  } catch (error) {
+    console.error(`Error updating stock:`, error);
+    alert(`Error updating stock for ${item.name}: ${error.message}`);
+    return;
+  }
+
   invoiceItems.push({
     id: item.id,
     name: item.name,
@@ -612,6 +627,7 @@ function addToInvoice(item, quantity) {
     lineTotal: price * quantity 
   });
   updateInvoiceTable();
+  fetchInventory();
 }
 
 function updateInvoiceTable() {
