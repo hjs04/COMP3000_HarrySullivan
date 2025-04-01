@@ -222,7 +222,32 @@ table th {
 /* Settings */
 .settings-content {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
+
+.settings-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-option label {
+  min-width: 100px;
+  font-weight: bold;
+}
+
+.settings-option select, .settings-option input[type="range"] {
+  flex: 1;
+  max-width: 200px;
+}
+
+#save-settings {
+  align-self: flex-start;
+  margin-top: 10px;
+}
+
 #settings-status {
   color: green;
   margin-top: 10px;

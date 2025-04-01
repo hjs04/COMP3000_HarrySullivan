@@ -78,6 +78,8 @@ function loadSettings() {
   document.body.className = savedTheme;
   const themeSelect = document.getElementById('theme-select');
   if (themeSelect) themeSelect.value = savedTheme;
+  const savedFontSize = localStorage.getItem('fontSize');
+  if (savedFontSize) document.body.style.fontSize = `${savedFontSize}px`;
 }
 
 function showSection(sectionId) {
@@ -760,6 +762,11 @@ document.getElementById('save-settings')?.addEventListener('click', () => {
   const status = document.getElementById('settings-status');
   status.style.display = 'block';
   setTimeout(() => status.style.display = 'none', 2000);
+});
+
+document.getElementById('font-size').addEventListener('input', (e) => {
+  document.body.style.fontSize = `${e.target.value}px`;
+  localStorage.setItem('fontSize', e.target.value);
 });
 
 // DOMContentLoaded
