@@ -650,9 +650,41 @@ function updateInvoiceTable() {
   document.getElementById('invoice-total').textContent = total.toFixed(2);
 }
 
-function removeInvoiceItem(index) {
+async function removeInvoiceItem(index) {
+  const removedItem = invoiceItems[index];
+  if (!removedItem) {
+    console.error('No item found at index:', index);
+    return;
+  }
+  try {
+    const itemResponse = await fetch(`http://localhost:3000/api/inventory/${removedItem.id}`, {
+      headers: { 'Authorization': localStorage.getItem('token') }
+    });
+    if (!itemResponse.ok) {
+      const errorText = await itemResponse.text();
+      console.error('Failed to fetch item:', errorText);
+      alert('Failed to fetch item: ' + errorText);
+      return;
+    }
+    const currentItem = await itemResponse.json();
+    const currentStock = parseInt(currentItem.stock) || 0;
+    const newStock = currentStock + removedItem.quantity;
+
+    await updateItem(removedItem.id, {
+      name: removedItem.name,
+      price: removedItem.price,
+      warehouse: removedItem.warehouse,
+      stock: newStock
+    })
+    console.log(`Stock updated for ${removedItem.name}: ${newStock}`);
+  } catch (error) {
+    console.error(`Error updating stock for ${removedItem.name}:`, error);
+    alert(`Error updating stock for ${removedItem.name}: ` + error.message);
+    return;
+  }
   invoiceItems.splice(index, 1);
   updateInvoiceTable();
+  await fetchInventory();
 }
 
 generateInvoiceButton.addEventListener('click', async () => {

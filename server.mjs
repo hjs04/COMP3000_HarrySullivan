@@ -252,6 +252,20 @@ app.get('/api/inventory', authenticateToken, async (req, res) => {
   }
 });
 
+app.get('/api/inventory/:id', authenticateToken, async (req, res) => {
+  console.log('GET /api/inventory/${req.params.id} hit');
+  try {
+    const item = await Inventory.findOne({ where: { id: req.params.id } });
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+    res.json(item);
+  } catch (error) {
+    console.error('Error fetching inventory item:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 app.post('/api/inventory', async (req, res) => {
   console.log('POST /api/inventory hit');
   try {
