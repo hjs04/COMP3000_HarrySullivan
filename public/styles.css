@@ -397,3 +397,112 @@ body.dark .add-to-invoice {
 body.dark .add-to-invoice:hover {
   background-color: #2980b9;
 }
+
+
+/* High Contrast Styling */
+
+body.high-contrast {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+body.high-contrast .sidebar {
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
+
+body.high-contrast .sidebar a {
+  color: #ffffff;
+}
+
+body.high-contrast .sidebar a:hover {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+body.high-contrast .content {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+body.high-contrast header {
+  background-color: #ffff00;
+  color: #000000;
+}
+
+body.high-contrast table {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+body.high-contrast table th {
+  background-color: #ffff00;
+  color: #000000;
+}
+
+body.high-contrast table td, body.high-contrast table th {
+  border: 1px solid #ffffff;
+}
+
+body.high-contrast input, body.high-contrast select {
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
+
+body.high-contrast button {
+  background-color: #ffff00;
+  color: #000000;
+}
+
+body.high-contrast button:hover {
+  background-color: #ffcc00;
+}
+
+body.high-contrast #inventory-form, body.high-contrast #auth-forms, body.high-contrast #employee-form {
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
+
+body.high-contrast .actions.add, body.high-contrast #add-item {
+  background-color: #00ff00;
+  color: #000000;
+}
+
+body.high-contrast .actions.add:hover, body.high-contrast #add-item:hover {
+  background-color: #00cc00;
+}
+
+body.high-contrast .actions.edit {
+  background-color: #ffff00;
+  color: #000000;
+}
+
+body.high-contrast .actions.delete {
+  background-color: #ff0000;
+  color: #ffffff;
+}
+
+body.high-contrast #logout-button {
+  background-color: #ff0000;
+  color: #ffffff;
+}
+
+body.high-contrast #logout-button:hover {
+  background-color: #cc0000;
+}
+
+body.high-contrast .add-to-invoice {
+  background-color: #00ffff;
+  color: #000000
+}
+
+body.high-contrast .add-to-invoice:hover {
+  background-color: #00cccc;
+}
+
+body.high-contrast #settings-status {
+  color: #00ff00;
+} 
