@@ -742,15 +742,24 @@ async function removeInvoiceItem(index) {
 
 generateInvoiceButton.addEventListener('click', async () => {
   const customerName = document.getElementById('invoice-customer').value;
+  const invoiceCurrency = document.getElementById('invoice-currency').value;
   if (!customerName || invoiceItems.length === 0) {
     alert('Please enter a customer name and add items to the invoice.');
     return;
   }
 
   const token = localStorage.getItem('token');
-  const currencySymbol = localStorage.getItem('currency') || '£';
+  const currencySymbol = invoiceCurrency;
+  const rate = exchangeRates[currencySymbol];
+
+  const convertedItems = invoiceItems.map(item => ({
+    ...item,
+    price: item.price * rate,
+    lineTotal: item.lineTotal * rate
+  }));
+
   console.log('Generating invoice with token:', token);
-  console.log('Invoice items being sent:', invoiceItems);
+  console.log('Invoice items being sent:', convertedItems);
   try {
     const response = await fetch('http://localhost:3000/api/invoices', {
       method: 'POST',
@@ -758,7 +767,7 @@ generateInvoiceButton.addEventListener('click', async () => {
         'Content-Type': 'application/json',
         'Authorization': token,
       },
-      body: JSON.stringify({ customerName, items: invoiceItems, currency: currencySymbol }),
+      body: JSON.stringify({ customerName, items: convertedItems, currency: currencySymbol }),
     });
 
     const responseText = await response.text();
@@ -837,7 +846,7 @@ function updateCurrencyDisplay() {
     const baseValue = value / (exchangeRates[cell.textContent[0]] || 1);
     cell.textContent = `${currencySymbol}${(baseValue * rate).toFixed(2)}`;
   });
-  
+
   const total = document.getElementById('invoice-total');
   const totalValue = parseFloat(total.textContent.replace(/[^0-9.]/g, '')) || 0;
   const baseTotal = totalValue / (exchangeRates[total.textContent[0]] || 1);

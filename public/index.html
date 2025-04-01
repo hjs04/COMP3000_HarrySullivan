@@ -114,6 +114,12 @@
         <h2>Generate Invoice</h2>
         <div>
             <label>Customer Name: <input type="text" id="invoice-customer" placeholder="Customer Name"></label>
+            <label for="invoice-currency">Invoice Currency:</label>
+            <select id="invoice-currency">
+              <option value="£">GBP (£)</option>
+              <option value="$">USD ($)</option>
+              <option value="€">EUR (€)</option>
+            </select>
             <button id="generate-invoice">Generate Invoice</button>
         </div>
         <table id="invoice-items-table">
