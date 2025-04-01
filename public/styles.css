@@ -127,6 +127,10 @@ table th {
   background-color: #2ecc71;
   color: white;
 }
+#image {
+  width: 35%;
+  height: auto;
+}
 
 /* Inventory Form */
 #inventory-form {

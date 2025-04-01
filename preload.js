@@ -4,4 +4,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   openPDF: (pdfPath) => ipcRenderer.send('open-pdf', pdfPath),
+  getImagePath: (imagePath) => {
+    return `http://localhost:3001/images/${imagePath}`
+  }
 });
