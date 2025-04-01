@@ -5,8 +5,8 @@ body {
   margin: 0;
   padding: 0;
   display: flex;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow: auto;
 }
 
 /* Sidebar */
@@ -228,6 +228,73 @@ table th {
   margin-top: 10px;
 }
 
+/* Authentication Form Styling */
+
+#auth-forms {
+  max-width: 800px;
+  width: 50%;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  position: relative;
+}
+
+#login-form, #register-form {
+  flex: 1;
+  min-width: 300px;
+}
+
+#login-form h3, #register-form h3 {
+  color: #3498db;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 24px;
+}
+
+#loginForm, #registerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#loginUsername, #loginPassword, #registerUsername, #registerPassword {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#loginUsername:focus, #loginPassword:focus, #registerUsername:focus, #registerPassword:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+#loginForm button, #registerForm button {
+  padding: 10px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 14px;
+}
+
+#loginForm button:hover, #registerForm button:hover {
+  background-color: #2980b9;
+}
+
+/* Dark Mode Styling */
+
 body.light {
   background-color: #ffffff;
   color: #000000;
@@ -257,6 +324,9 @@ body.dark button {
   color: #ffffff;
 }
 
+body.dark #auth-forms {
+  background-color: #2a2a2a;
+}
 
 body.dark #logout-button {
   background-color: #e74c3c;
@@ -285,7 +355,6 @@ body.dark .actions.add:hover {
   background-color: #27ae60;
 }
 
-/* Dark Mode Styling for Add Item Button */
 body.dark #add-item {
   background-color: #2ecc71;
   color: #ffffff;
@@ -295,7 +364,6 @@ body.dark #add-item:hover {
   background-color: #27ae60;
 }
 
-/* Dark Mode Styling for Add to Invoice Button */
 body.dark .add-to-invoice {
   background-color: #3498db;
   color: #ffffff;
