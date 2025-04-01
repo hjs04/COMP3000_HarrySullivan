@@ -226,10 +226,14 @@ app.delete('/api/employees/:id', authenticateToken, async (req, res) => {
     return res.status(403).json({ message: 'Admin access required' });
   }
   try {
-    const deleted = await User.destroy({ where: { id: req.params.id } });
-    if (user.role === "admin") {
-      return res.status(403).json({message: 'Cannot delete an admin account!'});
+    const user = await User.findOne({ where: { id: req.params.id } });
+    if (!user) {
+      return res.status(404).json({ message: 'Employee not found' });
     }
+    if (user.role === 'admin') {
+      return res.status(403).json({ message: 'Cannot delete an admin account!' });
+    }
+    const deleted = await User.destroy({ where: { id: req.params.id } });
     if (deleted) {
       res.sendStatus(204);
     } else {

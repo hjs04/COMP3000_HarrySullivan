@@ -431,9 +431,20 @@ async function fetchEmployees() {
         </td>
       `;
       row.querySelector('.edit').addEventListener('click', () => openEmployeeForm('Edit Employee', row));
-      row.querySelector('.delete').addEventListener('click', () => {
-        row.remove();
-        deleteEmployee(row.dataset.id);
+      row.querySelector('.delete').addEventListener('click', async () => {
+        if (employee.role === 'admin') {
+          alert('Cannot delete an admin account!');
+          return;
+        }
+        if (confirm('Are you sure you want to delete this employee?')) {
+          try {
+            await deleteEmployee(row.dataset.id);
+            row.remove();
+          } catch (error) {
+            console.error('Error deleting employee:', error);
+            alert('Error deleting employee: ' + error.message);
+          }
+        }
       });
     });
   } catch (error) {
@@ -469,10 +480,19 @@ async function updateEmployee(id, employee) {
 
 async function deleteEmployee(id) {
   const token = localStorage.getItem('token');
-  await fetch(`http://localhost:3000/api/employees/${id}`, {
-    method: 'DELETE',
-    headers: { 'Authorization': token }
-  });
+  try {
+    const response = await fetch(`http://localhost:3000/api/employees/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': token }
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Employee delete failed:', errorText);
+      throw new Error(errorText || 'Failed to delete employee');
+    } 
+  } catch (error) {
+    throw error; 
+  }
 }
 
 function openEmployeeForm(title, row) {
