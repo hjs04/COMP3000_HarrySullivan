@@ -289,7 +289,8 @@ function openForm(title, row = null) {
 
   if (row) {
     document.getElementById('item-name').value = row.cells[0].textContent;
-    document.getElementById('item-price').value = row.cells[1].textContent;
+    const priceSign = row.cells[1].textContent.replace('£', '');
+    document.getElementById('item-price').value = parseFloat(priceSign) || '';
     document.getElementById('item-warehouse').value = row.cells[2].textContent;
     document.getElementById('item-stock').value = row.cells[3].textContent;
     editingRow = row;
@@ -348,7 +349,7 @@ saveItemButton.addEventListener('click', async () => {
 
   if (editingRow) {
     editingRow.cells[0].textContent = name;
-    editingRow.cells[1].textContent = price;
+    editingRow.cells[1].textContent = `£${parseFloat(price).toFixed(2)}`;
     editingRow.cells[2].textContent = warehouse;
     editingRow.cells[3].textContent = stock;
     await updateItem(editingRow.dataset.id, { name, price, warehouse, stock });
