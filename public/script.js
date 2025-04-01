@@ -200,6 +200,7 @@ async function fetchInventory() {
     items.forEach(item => {
       const rawPrice = item.price != null ? String(item.price).replace(/[^0-9.]/g, '') : '0';
       const cleanPrice = parseFloat(rawPrice) || 0;
+      const stock = parseInt(item.stock) || 0;
       const row = inventoryTable.insertRow();
       row.dataset.id = item.id;
 
@@ -217,7 +218,7 @@ async function fetchInventory() {
       if (currentUserRole === 'admin') {
         rowHTML += `
           <td>
-            <input type="number" min="1" value="1" style="width: 50px;" id="qty-${item.id}">
+            <input type="number" min="1" max="${stock}" value="1" style="width: 50px;" id="qty-${item.id}">
             <button class="add-to-invoice">Add to Invoice</button>
           </td>
         `;
@@ -237,6 +238,10 @@ async function fetchInventory() {
         row.querySelector('.add-to-invoice').addEventListener('click', () => {
           const qtyInput = document.getElementById(`qty-${item.id}`);
           const quantity = parseInt(qtyInput.value) || 1;
+          if (quantity > stock) {
+            alert(`Quantity exceeds available stock (${stock}).`);
+            return;
+          }
           addToInvoice({ ...item, price: cleanPrice }, quantity);
         });
       }
@@ -595,6 +600,10 @@ function addToInvoice(item, quantity) {
     console.warn(`Invalid quantity for ${item.name}: ${quantity}`);
     quantity = 1; 
   }
+  if (quantity > item.stock) {
+    alert(`Quantity exceeds available stock (${item.stock}).`);
+    return;
+  };
   invoiceItems.push({
     id: item.id,
     name: item.name,
