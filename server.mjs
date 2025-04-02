@@ -314,9 +314,9 @@ app.delete('/api/inventory/:id', authenticateToken, async (req, res) => {
 
 app.post('/api/invoices', authenticateToken, async (req, res) => {
   console.log('POST /api/invoices hit with:', req.body);
-  const { customerName, items } = req.body;
-  if (!customerName || !items || items.length === 0) {
-    return res.status(400).json({ message: 'Customer name and items are required' });
+  const { customerName, items, currency} = req.body;
+  if (!customerName || !items || items.length === 0 || !currency) {
+    return res.status(400).json({ message: 'Customer name, items and currency are required' });
   }
 
   const validatedItems = items.map(item => {
@@ -335,20 +335,52 @@ app.post('/api/invoices', authenticateToken, async (req, res) => {
   const pdfPath = path.join(pdfDir, pdfFileName);
   const relativePdfPath = `invoices/${pdfFileName}`;
 
-  const doc = new PDFDocument();
+  const doc = new PDFDocument({size: 'A4', margin: 50});
   doc.pipe(fs.createWriteStream(pdfPath));
-  doc.fontSize(20).text('Invoice', { align: 'center' });
-  doc.moveDown();
-  doc.fontSize(12).text(`Customer: ${customerName}`);
-  doc.text(`Date: ${new Date().toLocaleDateString()}`);
-  doc.moveDown();
-  doc.text('Items:', { align: 'underline' });
+
+  doc.fontSize(25).font('Helvetica-Bold').text('Invoice', { align: 'center' });
+  doc.fontSize(15).font('Helvetica').text('ShipShape Systems Invoice System', { align: 'center' });
+  doc.moveDown(2);
+
+  doc.fontSize(14).font('Helvetica-Bold').text('ShipShape Systems', { align: 'center' });
+  doc.fontSize(12).font('Helvetica').text('1 ShipShape Way, Plymouth UK, PL1 1AA', { align: 'center' });
+  doc.text('VAT Number: GB123456789', { align: 'center' });
+  doc.text('Company Number: 07398 746806', { align: 'center' });
+  doc.moveDown(1);
+
+  doc.fontSize(12).text(`Customer: ${customerName}`, 50, doc.y, { align: 'left' });
+  doc.text(`Invoice Number: ${Date.now()}`, 50, doc.y + 15, { align: 'left' });
+  doc.text(`Invoice Date: ${new Date().toLocaleDateString()}`, 50, doc.y + 15, { align: 'left' });
+  doc.moveDown(2);
+
+  const tableTop = doc.y;
+  doc.fontSize(12).font('Helvetica-Bold');
+  doc.text('Item', 50, tableTop, { width: 200, align: 'left' });
+  doc.text('Price', 250, tableTop, { width: 100, align: 'right' });
+  doc.text('Quantity', 350, tableTop, { width: 100, align: 'right' });
+  doc.text('Total', 450, tableTop, { width: 100, align: 'right' });
+
+  doc.moveTo(50, tableTop + 20).lineTo(550, tableTop + 20).stroke();
+
+  let yPosition = tableTop + 25;
   validatedItems.forEach((item, index) => {
     const lineTotal = item.price * item.quantity;
-    doc.text(`${index + 1}. ${item.name} - £${item.price.toFixed(2)} x ${item.quantity} = £${lineTotal.toFixed(2)}`);
+    doc.fontSize(10).font('Helvetica');
+    doc.text(`${index + 1}. ${item.name}`, 50, yPosition, { width: 200, align: 'left' });
+    doc.text(`${currency}${item.price.toFixed(2)}`, 250, yPosition, { width: 100, align: 'right' });
+    doc.text(`${item.quantity}`, 350, yPosition, { width: 100, align: 'right' });
+    doc.text(`${currency}${lineTotal.toFixed(2)}`, 450, yPosition, { width: 100, align: 'right' });
+    yPosition += 20;
   });
-  doc.moveDown();
-  doc.text(`Total: £${total.toFixed(2)}`, { align: 'right' });
+
+  doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke();
+
+  doc.fontSize(12).font('Helvetica-Bold').text('Total:', 350, yPosition + 20, { align: 'left' });
+  doc.fontSize(12).font('Helvetica').text(`${currency}${total.toFixed(2)}`, 450, yPosition + 20, { align: 'right' });
+  doc.moveDown(2);
+
+  doc.fontSize(12).font('Helvetica').text('Thank you for your custom!', { align: 'center' });
+ 
   doc.end();
 
   try {
