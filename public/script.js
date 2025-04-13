@@ -689,6 +689,20 @@ employeeForm.addEventListener('click', (event) => {
 
 // Finance Functions
 
+function tableVisibility() {
+  const invoiceTable = document.getElementById('invoice-items-table');
+  const emptyMessage = document.getElementById('empty-message');
+  const invoiceItemsBody = invoiceTable.querySelector('tbody');
+
+  if (invoiceItemsBody.children.length === 0) {
+    invoiceTable.style.display = 'none';
+    emptyMessage.style.display = 'block';
+  } else {
+    invoiceTable.style.display = 'table';
+    emptyMessage.style.display = 'none';
+  } 
+}
+
 async function addToInvoice(item, quantity) {
   const price = parseFloat(item.price);
   const stock = parseInt(item.stock) || 0;
@@ -748,6 +762,8 @@ function updateInvoiceTable() {
   const total = invoiceItems.reduce((sum, item) => sum + item.lineTotal, 0) * rate;
   console.log('Invoice total:', total);
   document.getElementById('invoice-total').textContent = `${currencySymbol}${total.toFixed(2)}`;
+
+  tableVisibility();
 }
 
 async function removeInvoiceItem(index) {
@@ -784,6 +800,7 @@ async function removeInvoiceItem(index) {
   }
   invoiceItems.splice(index, 1);
   updateInvoiceTable();
+  tableVisibility();
   await fetchInventory();
 }
 
@@ -930,4 +947,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  tableVisibility();
 });

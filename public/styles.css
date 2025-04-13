@@ -241,6 +241,17 @@ table th {
   background-color: #0056b3;
 }
 
+#empty-message {
+  color: #555555;
+  font-style: italic;
+  margin: 10px 0;
+}
+
+.table-divider {
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
+}
+
 /* Settings */
 .settings-content {
   padding: 20px;
