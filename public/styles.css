@@ -190,21 +190,6 @@ table th {
   background-color: #27ae60;
 }
 
-#logout-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-#logout-button:hover {
-  background-color: #c0392b;
-}
-
 .add-to-invoice {
   padding: 5px 10px;
   background-color: #3498db; 
@@ -217,6 +202,43 @@ table th {
 
 .add-to-invoice:hover {
   background-color: #2980b9; 
+}
+
+#finances {
+  padding: 20px;
+}
+
+#finances h2, #finances h3 {
+  margin-bottom: 10px;
+}
+
+#finances table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#finances th, #finances td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+#finances th {
+  background-color: #3498db;
+  font-weight: bold;
+}
+
+#finances td button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#finances td button:hover {
+  background-color: #0056b3;
 }
 
 /* Settings */
@@ -323,6 +345,21 @@ a:focus, button:focus, input:focus, select:focus {
 
 #loginForm button:hover, #registerForm button:hover {
   background-color: #2980b9;
+}
+
+#logout-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#logout-button:hover {
+  background-color: #c0392b;
 }
 
 /* Dark Mode Styling */

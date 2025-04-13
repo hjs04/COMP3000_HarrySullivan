@@ -397,6 +397,26 @@ app.post('/api/invoices', authenticateToken, async (req, res) => {
   }
 });
 
+app.get('/api/invoices', authenticateToken, async (req, res) => {
+  console.log('GET /api/invoices hit');
+  try {
+    const invoices = await Invoice.findAll({
+      attributes: ['id', 'customerName', 'total', 'pdfPath', 'createdAt'],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(invoices.map(invoice => ({
+      id: invoice.id,
+      customerName: invoice.customerName,
+      total: invoice.total !== null ? parseFloat(invoice.total) : 0,
+      pdfPath: path.join(__dirname, 'public', invoice.pdfPath),
+      createdAt: invoice.createdAt
+    })));
+  } catch (error) {
+    console.error('Error fetching invoices:', error);
+    res.status(500).json({ message: 'Error fetching invoices', error: error.message });
+  }
+});
+
 app.use(express.static('public'));
 app.use('/invoices', express.static(path.join(__dirname, 'public', 'invoices')));
 

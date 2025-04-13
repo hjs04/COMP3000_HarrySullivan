@@ -41,6 +41,7 @@ let editingRow = null;
 // Misc + Finances
 const overlay = document.getElementById('overlay');
 const generateInvoiceButton = document.getElementById('generate-invoice');
+const invoiceHistoryTable = document.getElementById('invoice-history-table').querySelector('tbody');
 
 let invoiceItems = [];
 
@@ -109,7 +110,9 @@ function showSection(sectionId) {
     fetchEmployees();
   } else if (sectionId === 'inventory') {
     fetchInventory();
-  } 
+  } else if (sectionId === 'finances') {
+    fetchInvoiceHistory();
+  }
 }
 
 function loadImage(imageName) {
@@ -429,6 +432,50 @@ saveItemButton.addEventListener('click', async () => {
 
   closeForm();
 });
+
+async function fetchInvoiceHistory() {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await fetch('http://localhost:3000/api/invoices', {
+      headers: { 'Authorization': token }
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Invoice fetch failed:', errorText);
+      alert('Failed to load invoices: ' + errorText);
+      return;
+    }
+
+    const invoices = await response.json();
+    invoiceHistoryTable.innerHTML = '';
+    const currencySymbol = localStorage.getItem('currency') || '£';
+    invoices.forEach(invoice => {
+      const row = invoiceHistoryTable.insertRow();
+      const total = invoice.total !== null && !isNaN(invoice.total) ? parseFloat(invoice.total) : 0;
+      row.innerHTML = `
+        <td>${new Date(invoice.createdAt).toLocaleDateString()}</td>
+        <td>${invoice.customerName}</td>
+        <td>${currencySymbol}${total.toFixed(2)}</td>
+        <td><button class="view-invoice" data-pdf="${invoice.pdfPath}">View</button></td>
+      `;
+      row.querySelector('.view-invoice').addEventListener('click', () => {
+        if (window.electronAPI) {
+          const absolutePath = invoice.pdfPath.replace(/\//g, '\\'); 
+          console.log('Opening PDF:', absolutePath);
+          window.electronAPI.openPDF(absolutePath);
+        } else {
+          const urlPath = invoice.pdfPath
+            .replace(__dirname.replace(/\\/g, '/'), '')
+            .replace('public', 'http://localhost:3000');
+          window.open(urlPath, '_blank');
+        }
+      });
+    });
+  } catch (error) {
+    console.error('Error fetching invoices:', error);
+    alert('Error fetching invoices: ' + error.message);
+  }
+}
 
 
 // Employee Management Functions
@@ -778,13 +825,16 @@ generateInvoiceButton.addEventListener('click', async () => {
       alert('Invoice generated successfully! Check the invoices folder.');
       console.log('PDF Path:', data.pdfPath);
       if (window.electronAPI) {
-        window.electronAPI.openPDF(data.pdfPath);
+        const absolutePath = data.pdfPath.replace(/\//g, '\\'); 
+        console.log('Opening generated PDF:', absolutePath);
+        window.electronAPI.openPDF(absolutePath);
       } else {
         console.warn('electronAPI not available');
       }
       invoiceItems = [];
       updateInvoiceTable();
       document.getElementById('invoice-customer').value = '';
+      fetchInvoiceHistory();
     } else {
       alert('Failed to generate invoice: ' + responseText);
     }
@@ -820,6 +870,7 @@ document.getElementById('font-size').addEventListener('input', (e) => {
 });
 
 document.getElementById('currency').addEventListener('change', (e) => {
+  const currency = e.target.value;
   localStorage.setItem('currency', currency);
     updateCurrencyDisplay();
 });
