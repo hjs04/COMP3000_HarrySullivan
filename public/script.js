@@ -54,9 +54,11 @@ const exchangeRates = {
 
 // Other Event Listeners
 
-overlay.addEventListener('click', () => {
-  closeForm();
-  closeEmployeeForm();
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) {
+    closeForm();
+    closeEmployeeForm();
+  }
 });
 
 window.addEventListener('beforeunload', () => {
@@ -577,6 +579,7 @@ function openEmployeeForm(title, row) {
   document.getElementById('employee-password').value = '';
   document.getElementById('employee-role').value = row ? row.cells[1].textContent : 'employee';
   employeeForm.style.display = 'block'; 
+  overlay.style.display = 'block';
   editingEmployeeRow = row;
 }
 
@@ -879,11 +882,6 @@ document.getElementById('save-settings')?.addEventListener('click', () => {
   const status = document.getElementById('settings-status');
   status.style.display = 'block';
   setTimeout(() => status.style.display = 'none', 2000);
-});
-
-document.getElementById('font-size').addEventListener('input', (e) => {
-  document.body.style.fontSize = `${e.target.value}px`;
-  localStorage.setItem('fontSize', e.target.value);
 });
 
 document.getElementById('currency').addEventListener('change', (e) => {

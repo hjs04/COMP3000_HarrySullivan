@@ -252,33 +252,163 @@ table th {
   margin: 20px 0;
 }
 
-/* Settings */
-.settings-content {
+/* Invoice Form Styling */
+
+#invoice-section {
   padding: 20px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+#invoice-section h2 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+#invoice-section > div:first-child {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  width: 100%;
+  max-width: 800px;
+}
+
+#invoice-section > div:first-child label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  color: #2c3e50;
+  flex: nowrap;
+}
+
+#invoice-customer, #invoice-currency {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  min-width: 130px;
+}
+
+#invoice-customer:focus, #invoice-currency:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+#generate-invoice {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#generate-invoice:hover {
+  background-color: #2980b9;
+}
+
+/* Employee Form Styling */
+
+#employee-form {
+  display: none;
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 350px;
+}
+
+#employee-form h3 {
+  color: #3498db;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+#employee-form input, #employee-form select {
+  display: block;
+  margin-bottom: 10px;
+  padding: 8px;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+#employee-form input:focus, #employee-form select:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+#employee-form button {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#employee-form button:hover {
+  background-color: #3498db;
+}
+
+
+/* Settings */
+#settings-content {
+  padding: 20px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .settings-option {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 12px;
 }
 
 .settings-option label {
   min-width: 100px;
   font-weight: bold;
+  color: #2c3e50;
 }
 
-.settings-option select, .settings-option input[type="range"] {
+.settings-option select, .settings-option input[type="number"] {
   flex: 1;
   max-width: 200px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.settings-option select:focus, .settings-option input[type="number"]:focus {
+  outline: none;
+  border-color: #3498db;
 }
 
 #save-settings {
-  align-self: flex-start;
-  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#save-settings:hover {
+  background-color: #2980b9;
 }
 
 #settings-status {
@@ -373,39 +503,55 @@ a:focus, button:focus, input:focus, select:focus {
   background-color: #c0392b;
 }
 
+
 /* Dark Mode Styling */
 
 body.light {
   background-color: #ffffff;
   color: #000000;
 }
+
 body.dark {
   background-color: #1a1a1a;
   color: #ffffff;
 }
+
 body.dark .sidebar {
   background-color: #2a2a2a;
 }
+
 body.dark .content {
   background-color: #1a1a1a;
   padding: 20px; 
 }
+
 body.dark table {
   background-color: #2a2a2a;
   color: #ffffff;
 }
+
 body.dark input, body.dark select {
   background-color: #333333;
   color: #ffffff;
   border: 1px solid #555555;
 }
+
 body.dark button {
   background-color: #444444;
   color: #ffffff;
 }
 
-body.dark #auth-forms {
+body.dark #auth-forms, body.dark #inventory-form, body.dark #employee-form, body.dark #settings-content {
   background-color: #2a2a2a;
+}
+
+body.dark #save-settings, body.dark #save-employee {
+  background-color: #3498db;
+  color: #ffffff;
+}
+
+body.dark #save-settings:hover, body.dark #save-employee:hover {
+  background-color: #2980b9;
 }
 
 body.dark #logout-button {
@@ -453,6 +599,28 @@ body.dark .add-to-invoice:hover {
   background-color: #2980b9;
 }
 
+body.dark #invoice-section { 
+  background-color: #2a2a2a;
+}
+
+body.dark #invoice-section h2, body.dark #invoice-section label {
+  color: #ffffff;
+}
+
+body.dark #invoice-customer, body.dark #invoice-currency {
+  background-color: #333333;
+  color: #ffffff;
+  border: 1px solid #555555;
+}
+
+body.dark #generate-invoice {
+  background-color: #3498db;
+  color: #ffffff;
+}
+
+body.dark #generate-invoice:hover {
+  background-color: #2980b9;
+}
 
 /* High Contrast Styling */
 
@@ -515,10 +683,19 @@ body.high-contrast button:hover {
   background-color: #ffcc00;
 }
 
-body.high-contrast #inventory-form, body.high-contrast #auth-forms, body.high-contrast #employee-form {
+body.high-contrast #inventory-form, body.high-contrast #auth-forms, body.high-contrast #employee-form, body.high-contrast #settings-content {
   background-color: #000000;
   color: #ffffff;
   border: 1px solid #ffffff;
+}
+
+body.high-contrast #save-settings, body.high-contrast #save-employee {
+  background-color: #00ffff;
+  color: #000000;
+}
+
+body.high-contrast #save-settings:hover, body.high-contrast #save-employee:hover {
+  background-color: #00cccc;
 }
 
 body.high-contrast .actions.add, body.high-contrast #add-item {
@@ -561,3 +738,28 @@ body.high-contrast .add-to-invoice:hover {
 body.high-contrast #settings-status {
   color: #00ff00;
 } 
+
+body.high-contrast #invoice-section {
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
+
+body.high-contrast #invoice-section h2, body.high-contrast #invoice-section label {
+  color: #ffffff;
+}
+
+body.high-contrast #invoice-customer, body.high-contrast #invoice-currency {
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
+
+body.high-contrast #generate-invoice {
+  background-color: #00ffff;
+  color: #000000;
+}
+
+body.high-contrast #generate-invoice:hover {
+  background-color: #00cccc;
+}

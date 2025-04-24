@@ -1,7 +1,7 @@
 {
-  "name": "your-project-name",
-  "version": "1.0.0",
-  "description": "Your project description",
+  "name": "shipshape-systems",
+  "version": "1.2.4",
+  "description": "An inventory management system",
   "main": "main.js",
   "type": "module",
   "scripts": {
@@ -89,6 +89,6 @@
   },
   "keywords": [],
   "devDependencies": {
-    "electron": "^34.0.2"
+    "electron": "^34.5.1"
   }
 }
