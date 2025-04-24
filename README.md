@@ -1,6 +1,7 @@
 # COMP3000_HarrySullivan
 
 Project Title: ShipShape Systems
+
 Supervisor: Rory Hopcraft
 
 ShipShape Systems is an inventory management application, originally aimed at shipyards or ports but has now turned towards general purpose instead.
@@ -17,5 +18,7 @@ Setup:
 - Run run.bat.
 
 For testing:
+
 Username - admin
+
 Password - admin
